@@ -1,0 +1,119 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+<script type="text/javascript">
+	function getDaysInMonth(month, year) {
+		return new Date(year, month+1, 0).getDate();
+	}
+	
+	$(document).ready(function(){
+		date = new Date();
+		
+		function calcProrateFromToday() {
+			daysInMonth = getDaysInMonth(date.getFullYear(), date.getMonth());
+			proratedDays = daysInMonth - date.getDate();
+		
+			$('input#days').val(proratedDays);
+		}
+		
+		function calc() {
+			
+			
+			
+			period = parseInt($('select#period').val());
+			proRate = $('select#prorate').val()=='1'?true:false;
+			prorated = parseInt($('input#days').val()) * 1.61;
+			membership = parseInt($('select#level').val()) * period;
+			if (period==3) {
+				membership = membership * 0.9;	
+			} else if (period==12) {
+				membership = membership * 0.8;
+			}
+			membership = parseFloat($('select#discount').val()) * membership;
+			if (proRate) {
+				amount = membership + prorated;
+				period = period + 1;
+				
+			} else {
+				amount = membership;
+			}
+
+			nextPayment = new Date(date.getFullYear(), date.getMonth()+period, 1 );
+			$('span#total').text(Math.round(amount*100)/100);
+			$('span#due').text(nextPayment.toDateString());
+			
+		}
+		calcProrateFromToday();
+		calc();
+		$('select, input').change(calc);
+		$('form').submit(function(e) {
+			e.preventDefault();
+			return false;
+			
+		});
+		$('a#from-today').click(function(e) {
+			calcProrateFromToday();
+			calc();
+			e.preventDefault();
+			return false;
+		})
+	});
+</script>
+<title>LMN Prorating Calculator</title>
+</head>
+<body>
+<h1>LMN Prorating Calculator</h1>
+<form id="calc">
+	<div>
+		<label for="prorate">Pro-rate</label>
+		<select id="prorate">
+			<option value="1">Yes</option>
+			<option value="0">No</option>
+		</select>
+		
+	</div>
+	
+	<div>
+		<label for="level">Membership Level</label>
+		<select id="level">
+			<option value="50">Coder/Crafter</option>
+			<option value="80">Full</option>
+		</select>
+	</div>
+	<div>
+		<label for="days">Prorated Days</label>
+		<input width="4" id="days"/>
+		<a id="from-today" href="#">Calc from Today</a>
+	</div>
+	<div>
+		<label for="period">Renewal Period</label>
+		<select id="period">
+			<option value="1">One Month</option>
+			<option value="3">Three Month</option>
+			<option value="12">One Year</option>
+		</select>
+	</div>
+	<div>
+		<label for="discount">Discount</label>
+		<select id="discount">
+			<option value="1">None</option>
+			<option value="0.5">Family</option>
+			<option value="0.5">Senior</option>
+		</select>
+	</div>
+	<div>
+		<label>Total Due:</label>
+		$<span id="total"></span>
+	</div>
+	<div>
+		<label>Next Due On:</label>
+		<span id="due"></span>
+	</div>
+	
+	
+
+</form>
+</body>
+</html>
